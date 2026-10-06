@@ -14,7 +14,7 @@ public class OpeningCutscene : MonoBehaviour
     [Range(0f, 1f)] public float volume = 1f;
     public float fadeOut = 0.8f;
     public float fadeIn = 0.9f;
-    public bool allowSkip = true;
+    public bool allowSkip = false;   // opening cutscene is never skippable
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics() { Pending = false; }
@@ -43,7 +43,7 @@ public class OpeningCutscene : MonoBehaviour
     RawImage screen;
     Text skipLabel;
     Behaviour[] frozen;
-    bool finished, ending, canSkip;
+    bool finished, ending, canSkip, failed;
     float startedAt;
 
     void Start()
@@ -99,7 +99,7 @@ public class OpeningCutscene : MonoBehaviour
         vp.renderMode = VideoRenderMode.RenderTexture;
         vp.audioOutputMode = VideoAudioOutputMode.Direct;
         vp.loopPointReached += s => Finish();
-        vp.errorReceived += (s, msg) => { Debug.LogWarning("OpeningCutscene: " + msg); Finish(); };
+        vp.errorReceived += (s, msg) => { Debug.LogWarning("OpeningCutscene: " + msg); failed = true; Finish(); };
         vp.prepareCompleted += OnPrepared;
         vp.Prepare();
         startedAt = Time.unscaledTime;
@@ -143,14 +143,14 @@ public class OpeningCutscene : MonoBehaviour
         float since = Time.unscaledTime - startedAt;
         if (skipLabel != null) skipLabel.color = new Color(1f, 1f, 1f, canSkip ? 0.75f * Mathf.Clamp01((since - 1f) / 0.5f) : 0f);
         if (canSkip && since > 0.6f && SkipPressed()) Finish();
-        if (!vp.isPrepared && since > 20f) Finish();
+        if (!vp.isPrepared && since > 20f) { failed = true; Finish(); }
     }
 
     void Finish()
     {
         if (ending) return;
         ending = true;
-        CutsceneMemory.MarkSeen(videoFileName);
+        if (!failed) CutsceneMemory.MarkSeen(videoFileName);   // a video that never played doesn't count as seen
         StartCoroutine(FadeAndEnd());
     }
 

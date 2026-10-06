@@ -41,6 +41,7 @@ namespace FPCharacter
         [Range(0f, 1f)] public float sfxVolume = 1f;
 
         public bool Powered { get; private set; }
+        public bool BeamReaching => Time.time - lastHit <= beamGrace;
         public int CurrentStep { get; private set; } = -1;
         public bool Solved { get; private set; }
         public bool Shattered { get; private set; }

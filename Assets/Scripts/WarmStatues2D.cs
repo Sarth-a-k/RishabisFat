@@ -11,6 +11,25 @@ public class WarmStatues2D : MonoBehaviour
     [Header("Return to the 3D world")]
     public string returnScene = "FourfoldCitadel_WithOurStuff";
 
+    [Header("Next minigame (played before the final line; leave empty to skip it)")]
+    public string bossScene = "FurnaceHeart2D";
+
+    // set when leaving for the boss scene; the boss loads this scene again and only the final line is shown
+    static bool finaleOnly;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() { finaleOnly = false; catches = 0; }
+
+    [Header("Easy mode after repeated catches")]
+    public bool easierAfterCatches = true;
+    public int catchesBeforeEasy = 2;
+    [Tooltip("In easy mode statues creep this many times slower and the time limit is this many times longer.")]
+    public float easySlowdown = 3f;
+
+    static int catches;                     // kept between tries until the puzzle is solved
+    bool Easy => easierAfterCatches && catches >= catchesBeforeEasy;
+    float Slow => Easy ? Mathf.Max(1f, easySlowdown) : 1f;
+
     [Header("Ending")]
     public string crackLine = "THE LAST STATUE CRACKS IN THE HEAT.";
     public string bodyLine = "THERE IS A BODY INSIDE. IT IS WEARING YOUR HELMET.";
@@ -22,6 +41,8 @@ public class WarmStatues2D : MonoBehaviour
     public float finalFadeOut = 1.2f;
 
     [Header("Rules")]
+    [Tooltip("Off: stone statues still shuffle while the goggles are on, but never lunge at or catch the player.")]
+    public bool statuesAttack = false;
     public float timeLimit = 60f;
     public float[] creepIntervals = { 1.15f, 0.9f, 0.7f };
     [Range(0f, 1f)] public float musicVolume = 0.4f;
@@ -109,7 +130,7 @@ public class WarmStatues2D : MonoBehaviour
     RectTransform stage, world, actors, platesRoot, emberRoot;
     Image back, front, vignette, thermalOverlay, danger, frame, seam, blackImg, titleDim, barBg, barFill;
     readonly List<Image> grid = new List<Image>();
-    Text sightLabel, platesLabel, msgLabel, warnLabel, warn2Label, caughtLabel, pressLabel;
+    Text sightLabel, platesLabel, msgLabel, warnLabel, warn2Label, caughtLabel, pressLabel, controlsLabel;
     readonly List<Text> titleLabels = new List<Text>();
     JiggleLine titleJiggle, finalJiggle;
     Sprite sBack, sBackT, sFront, sFrontT, sStone, sBody, sDeadT, sPed, sCrack, sChunk, sPlateW, sPlateC, sDoneW, sDoneC, sHeat, sFlame, sDot;
@@ -138,6 +159,13 @@ public class WarmStatues2D : MonoBehaviour
         LoadAssets();
         BuildUI();
         ResetGame();
+        if (finaleOnly)
+        {
+            // back from Furnace Heart: go straight to the final line, then on to the 3D world as before
+            finaleOnly = false;
+            phase = "finale"; pt = 0f; black = 1f;
+            finalJiggle.SetText(finalLine, finalFontSize, finalColor);
+        }
     }
 
     void SetupCamera()
@@ -424,6 +452,9 @@ public class WarmStatues2D : MonoBehaviour
         PutLabel(caughtLabel, CX, H / 2f - 10f);
         msgLabel = Label("Message", stage, 24, TextAnchor.MiddleCenter, cream);
         PutLabel(msgLabel, CX, H - 64f);
+        controlsLabel = Label("Controls", stage, 16, TextAnchor.MiddleCenter, new Color(cream.r, cream.g, cream.b, 0.75f));
+        controlsLabel.text = "[WASD] MOVE     [G] GOGGLES     [R] RESTART";
+        PutLabel(controlsLabel, CX, 84f);
 
         titleDim = Full("Title dim", stage, null, new Color(0f, 0f, 0f, 0.6f));
         AddTitle("THREE STATUES. THREE PLATES YOU CANNOT SEE.", 230f, 36);
@@ -548,7 +579,7 @@ public class WarmStatues2D : MonoBehaviour
         if (phase == "title")
         {
             phase = "play"; pt = 0f; startT = t;
-            Say("FIND THE PLATES. PUSH THE STATUES.");
+            Say(Easy ? "THE STATUES GROW SLUGGISH. TAKE YOUR TIME." : "FIND THE PLATES. PUSH THE STATUES.");
         }
     }
 
@@ -601,6 +632,7 @@ public class WarmStatues2D : MonoBehaviour
             int dx = pl.c - s.c, dy = pl.r - s.r;
             if (Mathf.Abs(dx) + Mathf.Abs(dy) <= 1)
             {
+                if (!statuesAttack) continue;   // beside the player: it waits instead of attacking
                 Slide(s, pl.c, pl.r);
                 Play(aScreech, 1f);
                 Caught();
@@ -632,11 +664,13 @@ public class WarmStatues2D : MonoBehaviour
 
     static int Sign(int v) { return v > 0 ? 1 : v < 0 ? -1 : 0; }
 
-    void Caught()
+    void Caught(string title = "THE STATUE CAUGHT YOU", string line = "YOU LOOKED AWAY TOO LONG.")
     {
         phase = "caught"; pt = 0f; thermal = false;
+        catches++;
+        caughtLabel.text = title;
         Boom(0.5f);
-        Say("YOU LOOKED AWAY TOO LONG.");
+        Say(line);
     }
 
     float Closeness()
@@ -662,7 +696,7 @@ public class WarmStatues2D : MonoBehaviour
         if (Down(KeyCode.G))
         {
             thermal = !thermal;
-            if (thermal) creepAt = t + 0.8f;
+            if (thermal) creepAt = t + 0.8f * Slow;
         }
         int dx = 0, dy = 0;
         bool down = false;
@@ -770,16 +804,16 @@ public class WarmStatues2D : MonoBehaviour
                 if (t >= creepAt)
                 {
                     Creep();
-                    creepAt = t + creepIntervals[Mathf.Clamp(n, 0, creepIntervals.Length - 1)];
+                    creepAt = t + creepIntervals[Mathf.Clamp(n, 0, creepIntervals.Length - 1)] * Slow;
                 }
             }
-            if (phase == "play" && t - startT > timeLimit) { Say("THE KEEP HAS RUN OUT OF PATIENCE."); Caught(); }
+            if (phase == "play" && t - startT > timeLimit * Slow) { Caught("OUT OF TIME", "THE KEEP HAS RUN OUT OF PATIENCE."); }
             if (phase == "play")
             {
                 bool all = true, settled = true;
                 foreach (Plate q in plates) if (!q.done) all = false;
                 foreach (Statue s in statues) if (s.mt < 1f) settled = false;
-                if (all && settled) { phase = "ending"; pt = 0f; thermal = false; }
+                if (all && settled) { phase = "ending"; pt = 0f; thermal = false; catches = 0; }
             }
         }
         if (phase == "ending")
@@ -789,7 +823,17 @@ public class WarmStatues2D : MonoBehaviour
             if (q > 0.1f && !e0) { e0 = true; Say(crackLine); Scrape(0.3f); }
             if (q > 1.3f && !e1) { e1 = true; Boom(0.4f); Say(bodyLine); }
             black = Mathf.Clamp01((q - 4.2f) / 1.2f);
-            if (q > 5.6f) { phase = "finale"; pt = 0f; finalJiggle.SetText(finalLine, finalFontSize, finalColor); }
+            if (q > 5.6f)
+            {
+                if (!loading && !string.IsNullOrEmpty(bossScene) && Application.CanStreamedLevelBeLoaded(bossScene))
+                {
+                    loading = true;
+                    finaleOnly = true;
+                    SceneManager.LoadScene(bossScene);
+                    return;
+                }
+                if (!loading) { phase = "finale"; pt = 0f; finalJiggle.SetText(finalLine, finalFontSize, finalColor); }
+            }
         }
         if (phase == "caught")
         {
@@ -845,7 +889,7 @@ public class WarmStatues2D : MonoBehaviour
         stage.localScale = new Vector3(sc, sc, 1f);
 
         bool th = thermal;
-        float dg = phase == "play" && th ? Closeness() : 0f;
+        float dg = statuesAttack && phase == "play" && th ? Closeness() : 0f;
         bool adj = dg >= 0.99f;
         world.anchoredPosition = adj ? new Vector2(Mathf.Sin(t * 71f) * 4f, -Mathf.Cos(t * 63f) * 3f) : Vector2.zero;
 
@@ -885,6 +929,7 @@ public class WarmStatues2D : MonoBehaviour
         bool hud = !title && phase != "finale";
         sightLabel.enabled = hud;
         platesLabel.enabled = hud;
+        controlsLabel.enabled = hud && (phase == "play" || phase == "caught");
         int done = 0;
         foreach (Plate q in plates) if (q.done) done++;
         sightLabel.text = th ? "THERMAL SIGHT" : "NORMAL SIGHT";

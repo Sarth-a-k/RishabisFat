@@ -19,6 +19,9 @@ namespace FPCharacter
 
         [Header("Timing")]
         public Vector2 delayRange = new Vector2(10f, 15f);
+        public float torchDelay = 45f;
+        public float alignmentDelay = 3f;
+        public float prismNearDistance = 3.5f;
         public float showSeconds = 7f;
         public float fadeSeconds = 0.8f;
         [Range(0f, 1f)] public float screenHeight = 0.86f;
@@ -40,6 +43,9 @@ namespace FPCharacter
         public Step alignMirrors = new Step { hints = new[] {
             "The light must travel Oval, then Rectangle, then Circle, and on to the prism.",
             "Look at a placed mirror and hold Q or R to turn it. Its stone glows green when it faces true." } };
+        public Step checkAlignment = new Step { hints = new[] {
+            "The light reaches the prism, but it stays dark... maybe the alignment is different.",
+            "One of the mirrors may have shifted. Check each stone: it glows green when its mirror faces true." } };
         public Step turnPrism = new Step { hints = new[] {
             "The prism drinks the light. Look at it and press E to turn it.",
             "Keep turning the prism until the moon burns red." } };
@@ -57,6 +63,7 @@ namespace FPCharacter
         string text;
         float shownAt = -100f;
         float hideAt = -100f;
+        bool alignmentStuck;
 
         void Start()
         {
@@ -64,7 +71,14 @@ namespace FPCharacter
             if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
             audioSource.spatialBlend = 0f;
-            nextDelay = UnityEngine.Random.Range(delayRange.x, delayRange.y);
+            nextDelay = DelayFor(lastKey);
+        }
+
+        float DelayFor(int key)
+        {
+            if (key == 0) return torchDelay;
+            if (key == 350) return alignmentDelay;
+            return UnityEngine.Random.Range(delayRange.x, delayRange.y);
         }
 
         void Update()
@@ -89,7 +103,7 @@ namespace FPCharacter
                 lastKey = key;
                 stuck = 0f;
                 index = 0;
-                nextDelay = UnityEngine.Random.Range(delayRange.x, delayRange.y);
+                nextDelay = DelayFor(key);
                 if (Showing) hideAt = Mathf.Min(hideAt, Time.time);
             }
 
@@ -102,14 +116,14 @@ namespace FPCharacter
             if (Showing) return;
 
             stuck += Time.deltaTime;
-            if (stuck < nextDelay) return;
+            if (stuck < nextDelay || SubtitleBox.Busy) return;
 
             text = Fill(step.hints[index % step.hints.Length], carried);
             index++;
             shownAt = Time.time;
             hideAt = Time.time + fadeSeconds + showSeconds;
             stuck = 0f;
-            nextDelay = UnityEngine.Random.Range(delayRange.x, delayRange.y);
+            nextDelay = key == 350 ? UnityEngine.Random.Range(delayRange.x, delayRange.y) : DelayFor(key);
             if (whisper != null) audioSource.PlayOneShot(whisper, whisperVolume);
         }
 
@@ -129,10 +143,20 @@ namespace FPCharacter
             foreach (MirrorSocket s in sockets) if (s != null) total++;
             if (occupied < total)
             {
+                alignmentStuck = false;
                 key = 100 + occupied * 10 + (carried != null ? 1 : 0);
                 return carried != null ? carryMirror : findMirrors;
             }
-            if (prism != null && !prism.Powered && !prism.Solved) { key = 300 + aligned; return alignMirrors; }
+            if (prism != null && !prism.Powered && !prism.Solved)
+            {
+                // all mirrors placed and the light (or the player) is at the prism, yet it stays dark
+                bool near = player != null && Vector3.Distance(player.position, prism.transform.position) <= prismNearDistance;
+                if (prism.BeamReaching || near) alignmentStuck = true;
+                if (alignmentStuck) { key = 350; return checkAlignment; }
+                key = 300 + aligned;
+                return alignMirrors;
+            }
+            alignmentStuck = false;
             if (prism != null && !prism.Solved) { key = 400; return turnPrism; }
             if (!ShadowRunGate.ShadowRunFinished) { key = 500; return goToGate; }
             key = 600;
@@ -175,16 +199,8 @@ namespace FPCharacter
             a = Mathf.Clamp01(a);
             if (a <= 0f) return;
 
-            Color bg = PromptBox.background, border = PromptBox.border, tc = PromptBox.textColor, sc = PromptBox.shadowColor;
-            PromptBox.background = new Color(bg.r, bg.g, bg.b, bg.a * a);
-            PromptBox.border = new Color(border.r, border.g, border.b, border.a * a);
-            PromptBox.textColor = new Color(tc.r, tc.g, tc.b, tc.a * a);
-            PromptBox.shadowColor = new Color(sc.r, sc.g, sc.b, sc.a * a);
-            PromptBox.Draw(text, screenHeight, 0);
-            PromptBox.background = bg;
-            PromptBox.border = border;
-            PromptBox.textColor = tc;
-            PromptBox.shadowColor = sc;
+            // same dialogue box as notes and voice lines; spoken lines (priority 0) win over hints
+            SubtitleBox.Draw(null, text, a, -1);
         }
     }
 }

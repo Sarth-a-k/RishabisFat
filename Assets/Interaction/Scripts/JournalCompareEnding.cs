@@ -130,7 +130,8 @@ namespace FPCharacter
             heartbeatSound = Resources.Load<AudioClip>("Journal/heartbeat");
         }
 
-        public bool allowVideoSkip = false;
+        public bool allowVideoSkip = false;   // ending video is never skippable
+        bool canSkipVideo, videoFailed;
 
         static void AddGlow(GameObject book)
         {
@@ -151,7 +152,7 @@ namespace FPCharacter
         {
             if (running)
             {
-                if (allowVideoSkip && vp != null && vp.isPlaying && !videoDone && SkipPressed()) videoDone = true;
+                if (canSkipVideo && vp != null && vp.isPlaying && !videoDone && SkipPressed()) videoDone = true;
                 return;
             }
             looking = false;
@@ -422,17 +423,19 @@ namespace FPCharacter
             {
                 screen.enabled = true;
                 vp.SetDirectAudioVolume(0, videoVolume);
+                canSkipVideo = allowVideoSkip && CutsceneMemory.Seen(videoFileName);
                 vp.Play();
                 CutsceneGate.Begin(this);
                 float since = 0f;
                 while (!videoDone)
                 {
                     since += Time.deltaTime;
-                    if (skipLabel != null) skipLabel.color = new Color(1f, 1f, 1f, allowVideoSkip ? 0.7f * Mathf.Clamp01((since - 1f) / 0.5f) : 0f);
+                    if (skipLabel != null) skipLabel.color = new Color(1f, 1f, 1f, canSkipVideo ? 0.7f * Mathf.Clamp01((since - 1f) / 0.5f) : 0f);
                     if (since > 2f && !vp.isPlaying) videoDone = true;
                     yield return null;
                 }
                 if (skipLabel != null) skipLabel.enabled = false;
+                if (!videoFailed) CutsceneMemory.MarkSeen(videoFileName);
                 yield return Animate(0.8f, t =>
                 {
                     screen.color = new Color(1f, 1f, 1f, 1f - t);
@@ -644,7 +647,7 @@ namespace FPCharacter
             vp.renderMode = VideoRenderMode.RenderTexture;
             vp.audioOutputMode = VideoAudioOutputMode.Direct;
             vp.loopPointReached += s => videoDone = true;
-            vp.errorReceived += (s, msg) => { Debug.LogWarning("JournalCompareEnding: " + msg); videoDone = true; };
+            vp.errorReceived += (s, msg) => { Debug.LogWarning("JournalCompareEnding: " + msg); videoFailed = true; videoDone = true; };
             vp.prepareCompleted += s =>
             {
                 int w = (int)Mathf.Max(16, s.width), h = (int)Mathf.Max(16, s.height);

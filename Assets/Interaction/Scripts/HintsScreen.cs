@@ -136,13 +136,21 @@ namespace FPCharacter
         static readonly Level ShadowRun = new Level { title = "THE SHADOW RUN", hints = new[] {
             "Space, Enter or a click moves the ghost's conversation along.",
             "Walk with A and D or the arrow keys. Aim the torch with the mouse.",
-            "Point the torch at the shadows to hold them back, and keep walking." } };
+            "Hold the torch on a shadow for about a second and it burns away.",
+            "Keep walking right. The ember door at the end of the corridor is the way out.",
+            "If a shadow stays on you too long, the run starts again. After two tries it gets much easier." } };
         static readonly Level WarmStatues = new Level { title = "THE WARM STATUES", hints = new[] {
             "Move with W A S D or the arrow keys and push the statues onto the plates.",
             "Press G to put the goggles on. They show the hidden plates and which statue is still warm.",
             "Warm statue on a warm plate, cold statue on a cold plate.",
-            "The stone statues move while the goggles are on, so do not wear them too long.",
+            "The stone statues shuffle around while the goggles are on and can end up in your way.",
             "Press R to start again if you get stuck." } };
+        static readonly Level FurnaceHeart = new Level { title = "THE FURNACE HEART", hints = new[] {
+            "Move with W A S D or the arrows. Space, J or a left click slashes. Shift or K dashes.",
+            "Cut down the nine skeletons. Each one sends an ember into the furnace.",
+            "Press Q, E or right click for thermal sight. The heart, and a hidden censer, only show there.",
+            "Only the heart can be cut. Dash through the shockwave instead of running from it.",
+            "Press R to start again if you fall." } };
         static readonly Level LightBlade = new Level { title = "THE LIGHT BLADE", hints = new[] {
             "Move with W A S D or the arrows. Left click or Space slashes; every third slash is a spin.",
             "Right click or Shift dashes. Use it to slip past lunges and orbs.",
@@ -160,6 +168,7 @@ namespace FPCharacter
             if (scene.Contains("Shadow")) return ShadowRun;
             if (scene.Contains("WarmStatues")) return WarmStatues;
             if (scene.Contains("LightBlade")) return LightBlade;
+            if (scene.Contains("FurnaceHeart")) return FurnaceHeart;
             FPCharacterMover mover = FindAnyObjectByType<FPCharacterMover>();
             float x = mover != null ? mover.transform.position.x : 0f;
             if (x < 25f) return Nexus;

@@ -29,5 +29,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LightBlade2D.unity
     guid: debb25adff2f8d548938fcec9a11d1b4
+  - enabled: 1
+    path: Assets/Scenes/FurnaceHeart2D.unity
+    guid: caad53b4b5974f829f23f6af497465b6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

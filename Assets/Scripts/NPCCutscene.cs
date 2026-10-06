@@ -20,7 +20,7 @@ public class NPCCutscene : MonoBehaviour
 
     VideoPlayer vp;
     Transform player;
-    bool inRange, playing, played, triggerInside;
+    bool inRange, playing, played, triggerInside, failed;
     float startedAt;
     GUIStyle style;
     MonoBehaviour[] toggled = new MonoBehaviour[0];
@@ -39,7 +39,7 @@ public class NPCCutscene : MonoBehaviour
         vp.aspectRatio = VideoAspectRatio.FitInside;
         vp.audioOutputMode = VideoAudioOutputMode.Direct;
         vp.loopPointReached += OnFinished;
-        vp.errorReceived += (src, msg) => { Debug.LogWarning("NPCCutscene video error: " + msg, this); EndCutscene(); };
+        vp.errorReceived += (src, msg) => { Debug.LogWarning("NPCCutscene video error: " + msg, this); failed = true; EndCutscene(); };
         if (prompt != null) prompt.SetActive(false);
         if (replayable) playOnlyOnce = false;
     }
@@ -101,6 +101,7 @@ public class NPCCutscene : MonoBehaviour
     void StartCutscene()
     {
         playing = true;
+        failed = false;
         CutsceneGate.Begin(this);
         canSkip = allowSkip && CutsceneMemory.Seen(videoFileName);
         startedAt = Time.unscaledTime;
@@ -124,7 +125,7 @@ public class NPCCutscene : MonoBehaviour
         playing = false;
         CutsceneGate.End(this);
         played = true;
-        CutsceneMemory.MarkSeen(videoFileName);
+        if (!failed) CutsceneMemory.MarkSeen(videoFileName);   // a video that never played doesn't count as seen
         foreach (MonoBehaviour m in toggled) if (m != null) m.enabled = true;
         SetRange(inRange);
     }

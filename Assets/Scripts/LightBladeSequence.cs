@@ -52,7 +52,7 @@ public class LightBladeSequence : MonoBehaviour
     GameObject camObj; Camera cam; Transform fightRoot, hallRoot;
     AudioSource music, sfx; readonly Dictionary<string, AudioClip> clips = new Dictionary<string, AudioClip>();
     readonly Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
-    Sprite sqSprite; Texture2D blackTex, whiteTex; Font font; GUIStyle capStyle, bigStyle, dlgStyle, smallStyle;
+    Sprite sqSprite; Texture2D blackTex, whiteTex; Font font; GUIStyle capStyle, bigStyle, dlgStyle, smallStyle, ctrlStyle;
     readonly Stack<SpriteRenderer> pool = new Stack<SpriteRenderer>();
     float tNow, fadeBlack; string cap = ""; float capT;
 
@@ -306,7 +306,8 @@ public class LightBladeSequence : MonoBehaviour
     // longer warnings before lunges and throws, and longer safety after being hit.
     void ApplyDifficulty()
     {
-        ease = easierAfterDeaths ? Mathf.Clamp(deaths - deathsBeforeEasier, 0, Mathf.Max(0, maxEaseSteps)) : 0;
+        // drastic: once the player has died deathsBeforeEasier times, jump straight to the easiest setting
+        ease = easierAfterDeaths && deaths >= deathsBeforeEasier ? Mathf.Max(0, maxEaseSteps) : 0;
         maxHp = hitPoints + ease;
         curFightSeconds = fightSeconds * (1f - 0.14f * ease);
         curMaxShadows = Mathf.Max(4, maxShadowsAtOnce - 2 * ease);
@@ -830,6 +831,7 @@ public class LightBladeSequence : MonoBehaviour
             bigStyle = new GUIStyle(capStyle); bigStyle.fontSize = 34; smallStyle = new GUIStyle(capStyle); smallStyle.fontSize = 14; smallStyle.alignment = TextAnchor.UpperLeft; smallStyle.normal.textColor = Hex("#7d7892");
             dlgStyle = new GUIStyle(capStyle); dlgStyle.fontSize = 28; dlgStyle.alignment = TextAnchor.UpperLeft;
             if (font != null) { capStyle.font = font; bigStyle.font = font; smallStyle.font = font; dlgStyle.font = font; }
+            ctrlStyle = new GUIStyle(capStyle); ctrlStyle.fontSize = 14; ctrlStyle.normal.textColor = new Color(0.95f, 0.93f, 0.97f, 0.7f);
         }
         float k = Screen.height / 600f, offX = (Screen.width - 960f * k) / 2f; Matrix4x4 old = GUI.matrix;
         bool fight = mode == Mode.Play || mode == Mode.Won || mode == Mode.Leave || mode == Mode.Dead;
@@ -840,6 +842,11 @@ public class LightBladeSequence : MonoBehaviour
             Texture hOn = Spr("heart", 16, 16, 100f).texture, hOff = Spr("heart_empty", 16, 16, 100f).texture;
             for (int i = 0; i < maxHp; i++) GUI.DrawTexture(new Rect(18 + i * 26, 18, 32, 32), i < php ? hOn : hOff);
         }
+        // controls reminder, top centre; hidden on the death screen and while the hall dialogue runs
+        if (mode == Mode.Play || mode == Mode.Won || mode == Mode.Leave)
+            GUI.Label(new Rect(120, 22, 840, 24), "[WASD] MOVE     [LMB / SPACE] SLASH     [RMB / SHIFT] DASH", ctrlStyle);
+        else if (mode == Mode.Hall && hSc == 0)
+            GUI.Label(new Rect(120, 22, 840, 24), "[A D] WALK     [E] PRESS THE BUTTON", ctrlStyle);
         if (mode == Mode.Hall && hSc == 0 && Mathf.Abs(hx - (B2 - 17f)) < 14f)
         {
             Vector3 s0 = cam.WorldToScreenPoint(HP(B2, FY - 46f + Mathf.Round(Mathf.Sin(tNow * 5f)))); Rect r = new Rect((s0.x - offX) / k - 15f, (Screen.height - s0.y) / k - 15f, 30f, 30f);
@@ -864,7 +871,7 @@ public class LightBladeSequence : MonoBehaviour
             GUI.color = new Color(0.01f, 0f, 0.03f, 0.72f); GUI.matrix = old; GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), whiteTex);
             GUI.matrix = Matrix4x4.TRS(new Vector3(offX, 0f, 0f), Quaternion.identity, new Vector3(k, k, 1f)); GUI.color = Color.white;
             GUI.Label(new Rect(0, 240, 960, 50), "THE DARK TAKES HIM", bigStyle); GUI.Label(new Rect(0, 296, 960, 30), "press SPACE or click to try again", capStyle);
-            if (easierAfterDeaths && deaths > deathsBeforeEasier && ease < maxEaseSteps)
+            if (easierAfterDeaths && deaths >= deathsBeforeEasier && ease < maxEaseSteps)
             {
                 GUIStyle soft = new GUIStyle(capStyle); soft.fontSize = 16; soft.normal.textColor = Hex("#a9a3c4");
                 GUI.Label(new Rect(0, 332, 960, 26), "the light will hold a little longer", soft);

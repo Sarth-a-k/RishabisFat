@@ -16,6 +16,10 @@ namespace FPCharacter
         static int candidateFrame = -1, winnerFrame = -1, drawnFrame = -1;
         static string winner;
         static Texture2D soft;
+        static float lastDrawnAt = -10f;
+
+        // true while some line is on screen, so lower-priority text can wait its turn
+        public static bool Busy => Time.time - lastDrawnAt < 0.3f;
 
         public static void Draw(string text, float alpha = 1f)
         {
@@ -24,8 +28,14 @@ namespace FPCharacter
 
         public static void Draw(string speaker, string text, float alpha)
         {
+            Draw(speaker, text, alpha, 0);
+        }
+
+        public static void Draw(string speaker, string text, float alpha, int priority)
+        {
             if (string.IsNullOrEmpty(text) || alpha <= 0f || PromptBox.Hidden) return;
-            if (!PromptBox.Claim(text, 0, ref candidateFrame, candidates, ref winnerFrame, ref winner, ref drawnFrame)) return;
+            if (!PromptBox.Claim(text, priority, ref candidateFrame, candidates, ref winnerFrame, ref winner, ref drawnFrame)) return;
+            lastDrawnAt = Time.time;
             text = Clean(text);
             Setup();
             int fs = Mathf.Max(15, Screen.height / 30);

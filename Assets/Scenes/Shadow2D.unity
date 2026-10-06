@@ -149,20 +149,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a8a1b9caefe35545a7ab0d3056c2271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShadowRun2D
-  restartScene: FourfoldCitadel_WithOurStuff
+  restartScene: 
+  winScene: FourfoldCitadel_WithOurStuff
   commandFont: {fileID: 0}
   commandText: '[A][D] WALK      [MOUSE] AIM THE TORCH'
   walkSpeed: 2.5
   worldLeft: -2
-  worldRight: 62
+  worldRight: 65.5
   flickerStartsAt: 10
   torchDiesAt: 25.5
-  firstShadowAt: 6
-  secondShadowAt: 10
-  swarmFullAt: 22
-  endsBy: 33
-  burnTime: 0.9
-  shadowsToSmother: 10
+  firstShadowAt: 3
+  secondShadowAt: 5
+  burnTime: 0.8
 --- !u!4 &405080032
 Transform:
   m_ObjectHideFlags: 0

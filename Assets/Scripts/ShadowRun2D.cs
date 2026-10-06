@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 #endif
 
-// Casa del Silencio - the 2D "shadow run" section (version 7: pixel art, intro conversation with the ghost, captions).
+// Casa del Silencio - the 2D "shadow run" section (version 9 gameplay merged into version 7: winnable - hold the shadows off and reach the ember door).
 //
 // Setup (that's all of it):
 //   1. Copy the Shadow2D folder into Assets/Resources/  (so the files sit in Assets/Resources/Shadow2D/).
@@ -20,8 +20,10 @@ using UnityEngine.InputSystem;
 // (dlg_*.png), so no font is needed.
 //
 // Controls: A/D or arrow keys to walk, mouse to aim the torch across the upper 180 degrees.
-// The section is unwinnable by design: the swarm grows until the player is smothered,
-// the screen goes black, and the game restarts.
+// The section can be won: shadows keep coming, a few at a time. Hold the torch on one for about a second
+// and it recoils and burns away. Walk right to the ember door and the scene fades out to winScene.
+// If a shadow stays on the player for touchSeconds he dies and the section restarts.
+// After deathsBeforeEasier deaths it gets much easier.
 //
 // Everything is pixel art. For crisp pixels, select all the PNGs in the Shadow2D folder in Unity
 // and set Compression to None (the script already switches them to point filtering).
@@ -30,6 +32,20 @@ public class ShadowRun2D : MonoBehaviour
     [Header("Restart")]
     [Tooltip("Scene loaded after the screen goes black. Empty = first scene in the build list.")]
     public string restartScene = "";
+
+    [Header("Win")]
+    [Tooltip("Scene loaded when the player reaches the ember door. Empty = just fire onWin.")]
+    public string winScene = "";
+    [Tooltip("Fired once when the player reaches the ember door.")]
+    public UnityEngine.Events.UnityEvent onWin;
+    [Tooltip("World x of the ember door. The section ends when the player gets here.")]
+    public float doorX = 64.5f;
+    [Tooltip("Most shadows on screen at the same time.")]
+    public int maxAtOnce = 2;
+    [Tooltip("Seconds between shadows once the first two have come.")]
+    public float spawnGap = 3.2f;
+    [Tooltip("Tick to let the torch die at torchDiesAt, as in the old unwinnable version.")]
+    public bool torchCanDie = false;
 
     [Header("Command text")]
     [Tooltip("Optional. Drag MS Gothic (or any font) here to draw the command line as live text. Empty = the baked hint.png image.")]
@@ -49,7 +65,7 @@ public class ShadowRun2D : MonoBehaviour
     [Header("Player")]
     public float walkSpeed = 2.5f;
     public float worldLeft = -2f;
-    public float worldRight = 62f;
+    public float worldRight = 65.5f;
     public float ghostX = 4.2f;
     public float stopBeforeGhost = 1.3f;
 
@@ -61,17 +77,28 @@ public class ShadowRun2D : MonoBehaviour
 
     [Header("Shadows")]
     [Tooltip("Seconds before the first shadow appears (from behind).")]
-    public float firstShadowAt = 6f;
+    public float firstShadowAt = 3f;
     [Tooltip("Seconds before the second shadow appears (from the front).")]
-    public float secondShadowAt = 10f;
-    [Tooltip("Time at which the swarm reaches full strength.")]
-    public float swarmFullAt = 22f;
-    [Tooltip("The screen goes black by this time even if the swarm has not finished the job.")]
-    public float endsBy = 33f;
+    public float secondShadowAt = 5f;
     [Tooltip("Average seconds of torchlight needed to burn one shadow away (each shadow varies).")]
-    public float burnTime = 0.9f;
-    [Tooltip("How many shadows must grab the player before the screen goes black.")]
-    public int shadowsToSmother = 10;
+    public float burnTime = 0.8f;
+    [Tooltip("Seconds a shadow has to stay on the player before he dies and the section restarts.")]
+    public float touchSeconds = 2f;
+
+    [Header("Mercy")]
+    [Tooltip("After this many deaths the section gets much easier: one shadow at a time, slower, further apart, quicker to burn, and longer before a touch kills.")]
+    public int deathsBeforeEasier = 2;
+    public float easySpeed = 0.7f;
+    public float easyGap = 1.6f;
+    public float easyBurn = 0.6f;          // burn time multiplier in easy mode (lower = faster)
+    public float easyTouch = 2f;           // touchSeconds multiplier in easy mode
+
+    static int deaths;          // survives the scene restart; cleared when the player wins
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetDeaths() { deaths = 0; }
+    bool easy;
+    float touchT;
+    bool touchingNow;
+    float TouchLimit => touchSeconds * (easy ? easyTouch : 1f);
 
     // These match the baked art; change them only if you redraw the textures.
     const float ConeHalfAngle = 26f;
@@ -125,6 +152,7 @@ public class ShadowRun2D : MonoBehaviour
 
     void Start()
     {
+        easy = deaths >= deathsBeforeEasier;
         nextFlick = flickerStartsAt;
         SetupCamera();
         BuildWorld();
@@ -414,7 +442,7 @@ public class ShadowRun2D : MonoBehaviour
         if (intro) UpdateIntro(dt); else t += dt;
         UpdateGhostAndDialogue(dt);
 
-        float cover01 = Mathf.Clamp01(attachedCount / (float)Mathf.Max(1, shadowsToSmother));
+        float cover01 = Mathf.Clamp01(touchT / Mathf.Max(0.1f, TouchLimit));
 
         UpdateTorchLight();
         playerVx = 0f;
@@ -452,7 +480,8 @@ public class ShadowRun2D : MonoBehaviour
             float fadeIn = 1f - Mathf.Clamp01(sceneClock / 1.2f);
             SetAlpha(cover, Mathf.Max(fadeIn, Mathf.SmoothStep(0f, 1f, cover01) * 0.9f));
             SetAlpha(hint, Mathf.Clamp01(t / 1.5f) * (1f - Mathf.Clamp01((t - 7f) / 1.5f)));
-            if (attachedCount >= shadowsToSmother || t >= endsBy) StartCoroutine(Smothered());
+            if (touchT >= TouchLimit) StartCoroutine(Smothered());
+            else if (px >= doorX) StartCoroutine(Won());
         }
     }
 
@@ -510,7 +539,7 @@ public class ShadowRun2D : MonoBehaviour
         if (!barkSecond && spawnedCount >= 2) { barkSecond = true; Say("Bark_SecondShadow"); }
         if (!barkFlicker && t >= flickerStartsAt + 3f) { barkFlicker = true; Say("Bark_TorchFlicker"); }
         if (!barkMid && t >= 19f) { barkMid = true; Say("Bark_Halfway"); }
-        if (!barkDead && t >= torchDiesAt) { barkDead = true; Say("Bark_TorchDies"); }
+        if (torchCanDie && !barkDead && t >= torchDiesAt) { barkDead = true; Say("Bark_TorchDies"); }
     }
 
     void UpdateGhostAndDialogue(float dt)
@@ -537,13 +566,14 @@ public class ShadowRun2D : MonoBehaviour
         if (t >= nextFlick && t >= flickUntil)
         {
             float k = Mathf.Clamp01((t - flickerStartsAt) / 12f);
-            bool blackout = Random.value < 0.15f + 0.35f * k;
-            flickDepth = blackout ? 0f : Random.Range(0.35f, 0.75f);
+            bool blackout = torchCanDie && Random.value < 0.15f + 0.35f * k;
+            flickDepth = blackout ? 0f : (torchCanDie ? Random.Range(0.35f, 0.75f) : Random.Range(0.6f, 0.85f));
             flickUntil = t + Random.Range(0.08f, 0.3f) + (blackout ? 0.1f : 0f);
-            nextFlick = flickUntil + Mathf.Lerp(3.2f, 0.6f, k) * Random.Range(0.6f, 1.4f);
+            nextFlick = flickUntil + Mathf.Lerp(3.2f, torchCanDie ? 0.6f : 2.2f, k) * Random.Range(0.6f, 1.4f);
         }
         light = t < flickUntil ? flickDepth * (0.8f + 0.2f * Mathf.Sin(t * 90f)) : 1f;
         // Sputters for a moment, then dies for good.
+        if (!torchCanDie) return;
         if (t > torchDiesAt) light = 0f;
         else if (t > torchDiesAt - 0.9f) light *= Mathf.Max(0f, Mathf.Sin(t * 47f)) * (torchDiesAt - t) / 0.9f;
     }
@@ -552,7 +582,7 @@ public class ShadowRun2D : MonoBehaviour
     {
         float move = MoveAxis();   // he can walk while the ghost speaks
         if (move != 0f) lastDir = move > 0f ? 1 : -1;
-        playerVx = move * walkSpeed * (1f - 0.85f * cover01);
+        playerVx = move * walkSpeed * (1f - 0.4f * cover01);
         bool held = intro && introLine < introLinesBeforeWalking;
         float right = held ? Mathf.Min(worldRight, ghostX - stopBeforeGhost) : worldRight;
         px = Mathf.Clamp(px + playerVx * dt, worldLeft, right);
@@ -615,14 +645,15 @@ public class ShadowRun2D : MonoBehaviour
         }
         if (spawnedCount >= 2 && t >= nextSpawn)
         {
-            float k = Mathf.InverseLerp(secondShadowAt, swarmFullAt, t);
-            int count = k > 0.8f ? 2 : 1;
-            for (int i = 0; i < count; i++)
+            int alive = 0;
+            foreach (var sh in shadows) if (!sh.dying && !sh.attached) alive++;
+            if (alive < (easy ? 1 : maxAtOnce))
             {
-                bool above = k > 0.25f && Random.value < 0.3f;
+                float k = Mathf.Clamp01(px / Mathf.Max(1f, doorX)) * 0.5f;
+                bool above = spawnedCount >= 3 && Random.value < 0.25f;
                 Spawn(PickSide(), above, k);
+                nextSpawn = t + spawnGap * (easy ? easyGap : 1f) * Random.Range(0.8f, 1.2f);
             }
-            nextSpawn = t + (t > torchDiesAt ? 0.22f : Mathf.Lerp(2.6f, 0.3f, k));
         }
     }
 
@@ -641,9 +672,9 @@ public class ShadowRun2D : MonoBehaviour
         SetAlpha(s.grin, 0f);
         s.size = ShadowScale * Random.Range(0.85f, 1.25f);
         s.tr.localScale = Vector3.one * s.size;
-        s.speed = Mathf.Lerp(1.1f, 2.4f, k) * Random.Range(0.85f, 1.15f);
+        s.speed = Mathf.Lerp(1.1f, 2.4f, k) * Random.Range(0.85f, 1.15f) * (easy ? easySpeed : 1f);
         s.phase = Random.value * 10f;
-        s.resistance = Random.Range(0.5f, 1.7f);           // each one takes a different time to burn
+        s.resistance = Random.Range(0.8f, 1.2f);           // each one takes a different time to burn
         s.death = Random.Range(0, 4);                      // and vanishes in a different way
         s.dir = Random.value < 0.5f ? -1 : 1;
         s.fromAbove = fromAbove;
@@ -658,7 +689,6 @@ public class ShadowRun2D : MonoBehaviour
     {
         Vector2 shoulder = Shoulder();
         Vector2 target = (Vector2)player.position + Vector2.up * 1.2f;
-        float burnPower = light > 0.5f ? 1f : 0f;
         float range = ConeRange * Mathf.Max(0.25f, light);
 
         for (int i = shadows.Count - 1; i >= 0; i--)
@@ -710,18 +740,17 @@ public class ShadowRun2D : MonoBehaviour
             // Lunging gait. A shadow behind a fleeing player keeps up with him.
             float lunge = 1f + 0.7f * Mathf.Pow(Mathf.Max(0f, Mathf.Sin(t * 2.3f + s.phase)), 4f);
             bool fleeing = playerVx != 0f && Mathf.Sign(playerVx) == Mathf.Sign(toPlayer.x);
-            float v = (s.speed * lunge + (fleeing ? Mathf.Abs(playerVx) * 0.8f : 0f)) * (t > torchDiesAt ? 1.7f : 1f);
+            float v = (s.speed * lunge + (fleeing ? Mathf.Abs(playerVx) * 0.8f : 0f)) * (torchCanDie && t > torchDiesAt ? 1.7f : 1f);
 
             if (lit)
             {
-                s.hp -= dt / Mathf.Max(0.05f, burnTime * s.resistance) * burnPower;
-                if (s.fromAbove) pos -= toPlayer / dist * 1.2f * dt;
-                else pos.x -= Mathf.Sign(toPlayer.x) * 1.2f * dt;
+                s.hp -= dt / Mathf.Max(0.05f, burnTime * (easy ? easyBurn : 1f) * s.resistance);   // light adds up; burnTime in total and it is gone
+                if (s.fromAbove) pos -= toPlayer / dist * 0.4f * dt;
+                else pos.x -= Mathf.Sign(toPlayer.x) * 0.4f * dt;
                 pos.x += Mathf.Sin(t * 60f + s.phase) * 0.012f;   // shivers in the light
             }
             else
             {
-                s.hp = Mathf.Min(1f, s.hp + dt * 0.25f);
                 if (s.fromAbove) { if (dist > 0.75f) pos += toPlayer / dist * v * dt; }
                 else if (Mathf.Abs(toPlayer.x) > 0.55f) pos.x += Mathf.Sign(toPlayer.x) * v * dt;
             }
@@ -737,22 +766,17 @@ public class ShadowRun2D : MonoBehaviour
             }
 
             bool reached = s.fromAbove ? dist < 0.8f : Mathf.Abs(toPlayer.x) < 0.6f;
-            // Only a few may grab him while the torch still burns; the rest wait for the dark.
-            bool mayGrab = t > torchDiesAt || attachedCount < shadowsToSmother - 4;
-            if (reached && !ended && mayGrab)
-            {
-                s.attached = true;
-                s.offset = new Vector2(Random.Range(-0.7f, 0.7f), Random.Range(-0.4f, 0.5f));
-                s.body.sortingOrder = 40;        // in front of the player now
-                SetAlpha(s.body, 1f);
-                attachedCount++;
-            }
+            // It does not cling any more: it stands on him, and can still be burned or walked away from.
+            if (reached && !ended) touchingNow = true;
         }
+        if (!ended) touchT = touchingNow ? touchT + dt : Mathf.Max(0f, touchT - dt * 2f);
+        touchingNow = false;
     }
 
     IEnumerator Smothered()
     {
         ended = true;
+        deaths++;
         Say("Bark_Smothered");
         float start = cover.color.a;
         float startVol = ambience != null ? ambience.volume : 0f;
@@ -765,9 +789,33 @@ public class ShadowRun2D : MonoBehaviour
         SetAlpha(cover, 1f);
         yield return new WaitForSeconds(1.5f);
 
-        FPCharacter.VoiceDirector.QueueOnReturn("Return_PrismaticMinigame");
-        if (string.IsNullOrEmpty(restartScene)) SceneManager.LoadScene(0);
+        // death restarts this section (empty restartScene = reload this scene)
+        if (string.IsNullOrEmpty(restartScene)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         else SceneManager.LoadScene(restartScene);
+    }
+
+    IEnumerator Won()
+    {
+        ended = true;
+        foreach (var sh in shadows) { sh.attached = false; sh.dying = true; }   // any still on him let go and fade
+        attachedCount = 0;
+        deaths = 0;
+        yield return new WaitForSeconds(0.4f);
+        if (onWin != null) onWin.Invoke();
+        float start = cover.color.a;
+        float startVol = ambience != null ? ambience.volume : 0f;
+        for (float f = 0f; f < 1.5f; f += Time.deltaTime)
+        {
+            SetAlpha(cover, Mathf.Lerp(start, 1f, f / 1.5f));
+            if (ambience != null) ambience.volume = Mathf.Lerp(startVol, 0f, f / 1.5f);
+            yield return null;
+        }
+        SetAlpha(cover, 1f);
+        if (!string.IsNullOrEmpty(winScene))
+        {
+            FPCharacter.VoiceDirector.QueueOnReturn("Return_PrismaticMinigame");
+            SceneManager.LoadScene(winScene);
+        }
     }
 
     static void SetAlpha(SpriteRenderer r, float a) { if (r == null) return; var c = r.color; c.a = a; r.color = c; }

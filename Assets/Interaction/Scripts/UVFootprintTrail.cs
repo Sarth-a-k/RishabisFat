@@ -13,6 +13,7 @@ namespace FPCharacter
         float searching;
         float lastFound = -100f;
         Transform player;
+        bool playerInside;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics() { HintOn = false; current = null; }
@@ -39,10 +40,18 @@ namespace FPCharacter
             }
             Vector3 d = player.position - areaCenter;
             bool inside = Mathf.Abs(d.x) <= areaSize.x * 0.5f && Mathf.Abs(d.z) <= areaSize.y * 0.5f;
+            playerInside = inside;
             if (!inside) { searching = 0f; HintOn = false; return; }
             if (Time.time - lastFound < 0.5f) return;
             searching += Time.deltaTime;
             if (searching >= hintDelay) HintOn = true;
+        }
+
+        // key reminder while in the void; lowest priority so look-at prompts like [E] always win
+        void OnGUI()
+        {
+            if (!playerInside || NotePickup.Busy) return;
+            PromptBox.Draw(UVBaton.Active ? "[2] Put away the UV baton" : "[2] Take out the UV baton", 0.92f, 0);
         }
     }
 }

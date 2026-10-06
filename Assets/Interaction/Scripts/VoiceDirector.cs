@@ -10,8 +10,8 @@ namespace FPCharacter
         public string resourcePath = "Dialogue/VoiceLines";
         public Vector3 hollowsCenter = new Vector3(48.85f, 0f, 0f);
         public Vector2 hollowsSize = new Vector2(48.1f, 36.4f);
-        public float torchHintFirst = 5f;
-        public float torchHintRepeat = 60f;
+        public float torchHintFirst = 45f;
+        public float torchHintRepeat = 45f;
         public float mirrorHintDelay = 4f;
         public float prismHintDelay = 1.5f;
         public float redMoonHintDelay = 3.5f;
