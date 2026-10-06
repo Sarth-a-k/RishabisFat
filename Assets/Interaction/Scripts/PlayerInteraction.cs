@@ -108,6 +108,13 @@ namespace FPCharacter
             return shoulder + to.normalized * Mathf.Max(0.1f, d);
         }
 
+        float prismW;
+
+        Vector3 PrismRest()
+        {
+            return viewCamera.position + viewCamera.forward * 0.36f - viewCamera.right * 0.17f - viewCamera.up * 0.22f;
+        }
+
         Vector3 BatonRest()
         {
             return viewCamera.position + viewCamera.forward * 0.34f - viewCamera.right * 0.13f - viewCamera.up * 0.17f;
@@ -206,7 +213,7 @@ namespace FPCharacter
         void Update()
         {
             if (viewCamera == null) return;
-            if (bookW > 0f) { prompt = null; return; }
+            if (bookW > 0f || GamePause.BlockInput) { prompt = null; return; }
 
             lookMirror = null;
             lookTorch = null;
@@ -671,6 +678,20 @@ namespace FPCharacter
                 return;
             }
             weightR = Mathf.MoveTowards(weightR, 0f, dt * 5f);
+
+            PrismPickup held = PrismPickup.Carried;
+            bool prismOut = held != null && !UVBaton.Active && !lighterActive && upperL != null && handL != null;
+            prismW = Mathf.MoveTowards(prismW, prismOut ? 1f : 0f, dt * 4f);
+            if (prismOut)
+            {
+                Solve(upperL, foreL, handL, PrismRest(), Pole(upperL, -1f), prismW, reachL);
+                Vector3 g = GripCenter();
+                CurlFingers(g, prismW * 0.75f);
+                Vector3 off = viewCamera.right * held.handOffset.x + viewCamera.up * held.handOffset.y + viewCamera.forward * held.handOffset.z;
+                held.transform.position = Vector3.Lerp(held.transform.position, g + off, prismW);
+                held.transform.localScale = held.HandScaleValue;
+                return;
+            }
 
             bool batonOut = UVBaton.Active && !lighterActive;
             batonW = Mathf.MoveTowards(batonW, batonOut ? 1f : 0f, dt * 6f);

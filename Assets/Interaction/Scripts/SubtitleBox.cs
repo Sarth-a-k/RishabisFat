@@ -12,6 +12,9 @@ namespace FPCharacter
         public static float yCenter = 0.8f;
 
         static GUIStyle body, nameStyle;
+        static readonly System.Collections.Generic.List<PromptBox.Candidate> candidates = new System.Collections.Generic.List<PromptBox.Candidate>();
+        static int candidateFrame = -1, winnerFrame = -1, drawnFrame = -1;
+        static string winner;
         static Texture2D soft;
 
         public static void Draw(string text, float alpha = 1f)
@@ -21,7 +24,8 @@ namespace FPCharacter
 
         public static void Draw(string speaker, string text, float alpha)
         {
-            if (string.IsNullOrEmpty(text) || alpha <= 0f) return;
+            if (string.IsNullOrEmpty(text) || alpha <= 0f || PromptBox.Hidden) return;
+            if (!PromptBox.Claim(text, 0, ref candidateFrame, candidates, ref winnerFrame, ref winner, ref drawnFrame)) return;
             text = Clean(text);
             Setup();
             int fs = Mathf.Max(15, Screen.height / 30);

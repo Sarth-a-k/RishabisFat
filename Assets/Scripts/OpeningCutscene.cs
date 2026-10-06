@@ -48,6 +48,7 @@ public class OpeningCutscene : MonoBehaviour
 
     void Start()
     {
+        CutsceneGate.Begin(this);
         var list = new System.Collections.Generic.List<Behaviour>();
         foreach (FPCharacter.FPCharacterMover m in FindObjectsByType<FPCharacter.FPCharacterMover>(FindObjectsInactive.Exclude)) if (m.enabled) { m.enabled = false; list.Add(m); }
         foreach (FPCharacter.PlayerInteraction p in FindObjectsByType<FPCharacter.PlayerInteraction>(FindObjectsInactive.Exclude)) if (p.enabled) { p.enabled = false; list.Add(p); }
@@ -164,6 +165,7 @@ public class OpeningCutscene : MonoBehaviour
             yield return null;
         }
         finished = true;
+        CutsceneGate.End(this);
         if (vp != null) vp.Stop();
         if (frozen != null) foreach (Behaviour b in frozen) if (b != null) b.enabled = true;
         if (rt != null) rt.Release();

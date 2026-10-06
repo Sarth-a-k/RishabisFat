@@ -26,7 +26,7 @@ MonoBehaviour:
   - key: Hint_Torch
     clip: {fileID: 8300000, guid: 8af9a260dd490cc4f8c14b038f60057f, type: 3}
     speaker: 
-    subtitle: '[torchhint - type the subtitle here]'
+    subtitle: 'A light source must be nearby'
     volume: 1
   - key: Hint_Mirrors
     clip: {fileID: 8300000, guid: 0fdee899a15604c498632651d9d74fed, type: 3}
@@ -41,7 +41,7 @@ MonoBehaviour:
   - key: Hint_RedMoon
     clip: {fileID: 8300000, guid: fb262ec01a1f2174bbe5c616669a25e6, type: 3}
     speaker: 
-    subtitle: '[redmoonhint - type the subtitle here]'
+    subtitle: 'Red full moon.. hmm, I think this is my cue to leave'
     volume: 1
   - key: Return_PrismaticMinigame
     clip: {fileID: 8300000, guid: b3f900ce8465465695956ac42b5e8fae, type: 3}
@@ -57,6 +57,16 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 38deac8c19d14eb79d18dbff8396f6af, type: 3}
     speaker: 
     subtitle: 'Ohh... wait wait... wait... wait wait, is that the thermal vision goggles lying next to the skeleton?'
+    volume: 1
+  - key: Hint_SitChair
+    clip: {fileID: 8300000, guid: 7a4815e0e679489db73ffe8fe474f7bb, type: 3}
+    speaker: 
+    subtitle: 'Why isn''t anything happening? Should I be sitting on the chair too?'
+    volume: 1
+  - key: Hint_Journal
+    clip: {fileID: 8300000, guid: 7068c1be3c55471e819db85337a1d33c, type: 3}
+    speaker: 
+    subtitle: 'Wait, do I see a journal beside the skeleton on the throne?'
     volume: 1
   npcIgnoreKeys:
   - Npc_Ignore_01

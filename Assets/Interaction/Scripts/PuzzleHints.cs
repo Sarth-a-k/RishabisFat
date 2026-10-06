@@ -180,7 +180,7 @@ namespace FPCharacter
             PromptBox.border = new Color(border.r, border.g, border.b, border.a * a);
             PromptBox.textColor = new Color(tc.r, tc.g, tc.b, tc.a * a);
             PromptBox.shadowColor = new Color(sc.r, sc.g, sc.b, sc.a * a);
-            PromptBox.Draw(text, screenHeight);
+            PromptBox.Draw(text, screenHeight, 0);
             PromptBox.background = bg;
             PromptBox.border = border;
             PromptBox.textColor = tc;

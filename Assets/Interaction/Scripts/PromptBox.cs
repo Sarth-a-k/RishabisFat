@@ -12,9 +12,36 @@ namespace FPCharacter
         public static Color keyColor = new Color(0.1f, 0.1f, 0.12f, 1f);
         public static Color keyTextColor = new Color(1f, 1f, 1f, 1f);
         public static float cornerRadius = 3f;
-        static readonly List<Rect> placed = new List<Rect>();
-        static int placedFrame = -1;
-        static EventType placedEvent;
+        public struct Candidate { public string text; public int priority; }
+        static readonly List<Candidate> candidates = new List<Candidate>();
+        static int candidateFrame = -1, winnerFrame = -1, drawnFrame = -1;
+        static string winner;
+
+        public static bool Hidden => CutsceneGate.Active || GamePause.Paused;
+
+        public static bool Claim(string text, int priority, ref int candFrame, List<Candidate> list, ref int winFrame, ref string win, ref int doneFrame)
+        {
+            EventType ev = Event.current.type;
+            int frame = Time.frameCount;
+            if (ev == EventType.Layout)
+            {
+                if (candFrame != frame) { list.Clear(); candFrame = frame; }
+                list.Add(new Candidate { text = text, priority = priority });
+                return false;
+            }
+            if (ev != EventType.Repaint) return false;
+            if (winFrame != frame)
+            {
+                winFrame = frame;
+                win = null;
+                int best = int.MinValue;
+                if (candFrame == frame) foreach (Candidate c in list) if (c.priority > best) { best = c.priority; win = c.text; }
+            }
+            if (win == null) win = text;
+            if (text != win || doneFrame == frame) return false;
+            doneFrame = frame;
+            return true;
+        }
 
         static GUIStyle label, keyLabel;
         static readonly List<string> parts = new List<string>();
@@ -22,9 +49,11 @@ namespace FPCharacter
         static readonly List<float> widths = new List<float>();
         static string lastText;
 
-        public static void Draw(string text, float yFraction)
+        public static void Draw(string text, float yFraction, int priority = -1)
         {
-            if (string.IsNullOrEmpty(text)) return;
+            if (string.IsNullOrEmpty(text) || Hidden) return;
+            int pri = priority >= 0 ? priority : (text.IndexOf('[') >= 0 ? 2 : 1);
+            if (!Claim(text, pri, ref candidateFrame, candidates, ref winnerFrame, ref winner, ref drawnFrame)) return;
             Setup();
             int fs = Mathf.Max(14, Screen.height / 38);
             label.fontSize = fs;
@@ -49,19 +78,6 @@ namespace FPCharacter
             float h = keyD + padY * 2f;
             float wBox = total + leftPad + rightPad;
             var box = new Rect((Screen.width - wBox) * 0.5f, Screen.height * yFraction - h * 0.5f, wBox, h);
-            if (Time.frameCount != placedFrame || Event.current.type != placedEvent)
-            {
-                placed.Clear();
-                placedFrame = Time.frameCount;
-                placedEvent = Event.current.type;
-            }
-            for (int guard = 0; guard < 6; guard++)
-            {
-                bool hit = false;
-                foreach (Rect r in placed) if (r.Overlaps(box)) { box.y = r.yMax + fs * 0.35f; hit = true; }
-                if (!hit) break;
-            }
-            placed.Add(box);
             float a = textColor.a;
             float radius = cornerRadius * Mathf.Max(1f, Screen.height / 720f);
 

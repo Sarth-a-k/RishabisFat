@@ -174,6 +174,7 @@ namespace FPCharacter
             }
 
             bool visible = k > 0.001f || (sweepY > -9999f && shown * distK > 0.001f);
+            if (block == null) block = new MaterialPropertyBlock();
             block.SetColor("_Color", color);
             block.SetFloat("_Intensity", k);
             block.SetFloat("_SweepY", sweepY);

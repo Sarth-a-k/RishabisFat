@@ -9,7 +9,8 @@ namespace FPCharacter
         public PlayerSeat playerSeat;
         public PrismOverload overload;
         public string completedMessage = "The circle is complete";
-        public float messageSeconds = 5f;
+        public float messageSeconds = 2.2f;
+        public float messageFade = 0.6f;
         public UnityEvent onCompleted;
 
         public bool Completed { get; private set; }
@@ -46,7 +47,7 @@ namespace FPCharacter
                 style.fontStyle = FontStyle.Bold;
             }
             style.fontSize = Mathf.Max(18, Screen.height / 18);
-            float a = Mathf.Clamp01((messageUntil - Time.time) / 1f);
+            float a = Mathf.Clamp01((messageUntil - Time.time) / Mathf.Max(0.05f, messageFade));
             Rect r = new Rect(0f, Screen.height * 0.3f, Screen.width, style.fontSize * 2f);
             style.normal.textColor = new Color(0f, 0f, 0f, 0.8f * a);
             GUI.Label(new Rect(r.x + 3f, r.y + 3f, r.width, r.height), completedMessage, style);

@@ -56,7 +56,21 @@ namespace FPCharacter
             sfx = gameObject.AddComponent<AudioSource>();
             sfx.playOnAwake = false;
             sfx.spatialBlend = 0f;
-            if (readThisSession.Contains(id)) { done = true; if (col != null) col.enabled = false; }
+            if (readThisSession.Contains(id))
+            {
+                done = true;
+                if (col != null) col.enabled = false;
+                LieOnFloor();
+            }
+        }
+
+        void LieOnFloor()
+        {
+            Vector3 c = blocks != null ? blocks.position : transform.position;
+            Vector3 p = c + new Vector3(-0.7f, 0f, 0.8f);
+            float y = c.y;
+            if (Physics.Raycast(new Vector3(p.x, c.y + 1.5f, p.z), Vector3.down, out RaycastHit h, 4f, ~0, QueryTriggerInteraction.Ignore)) y = h.point.y;
+            transform.SetPositionAndRotation(new Vector3(p.x, y + 0.004f, p.z), Quaternion.Euler(0f, 37f, 0f));
         }
 
         void Update()
@@ -253,6 +267,7 @@ namespace FPCharacter
 
         static bool DonePressed()
         {
+            if (GamePause.BlockInput) return false;
 #if ENABLE_INPUT_SYSTEM
             return (Keyboard.current != null && (Keyboard.current.eKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame)) || (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame);
 #else

@@ -81,6 +81,7 @@ public class NPCCutscene : MonoBehaviour
 
     static bool EPressed()
     {
+        if (FPCharacter.GamePause.BlockInput) return false;
 #if ENABLE_INPUT_SYSTEM
         return Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
 #else
@@ -100,6 +101,7 @@ public class NPCCutscene : MonoBehaviour
     void StartCutscene()
     {
         playing = true;
+        CutsceneGate.Begin(this);
         canSkip = allowSkip && CutsceneMemory.Seen(videoFileName);
         startedAt = Time.unscaledTime;
         if (prompt != null) prompt.SetActive(false);
@@ -120,6 +122,7 @@ public class NPCCutscene : MonoBehaviour
         if (!playing) return;
         vp.Stop();
         playing = false;
+        CutsceneGate.End(this);
         played = true;
         CutsceneMemory.MarkSeen(videoFileName);
         foreach (MonoBehaviour m in toggled) if (m != null) m.enabled = true;

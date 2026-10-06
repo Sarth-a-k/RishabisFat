@@ -10,6 +10,9 @@ namespace FPCharacter
         public float useDistance = 2.6f;
         public Vector3 holdOffset = new Vector3(0.28f, -0.3f, 0.65f);
         public float holdScale = 0.45f;
+        public float handScale = 0.3f;
+        public Vector3 handOffset = new Vector3(0f, 0.045f, 0.01f);
+        public Vector3 HandScaleValue => restScale * handScale;
         public float bobSpeed = 1.6f;
         public float bobHeight = 0.06f;
         public float spinSpeed = 30f;
@@ -82,6 +85,7 @@ namespace FPCharacter
 
         public static bool InteractPressed()
         {
+            if (GamePause.BlockInput) return false;
 #if ENABLE_INPUT_SYSTEM
             return Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
 #else
@@ -92,7 +96,7 @@ namespace FPCharacter
         void OnGUI()
         {
             if (Carried == this && NotePickup.Busy) return;
-            if (Carried == this) { PromptBox.Draw("Carrying the prism  -  place it on the round table", 0.9f); return; }
+            if (Carried == this) { PromptBox.Draw("Equipped Prism", 0.9f); return; }
             if (looking) PromptBox.Draw("[E] Take the prism", 0.66f);
         }
     }

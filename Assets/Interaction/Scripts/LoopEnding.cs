@@ -79,6 +79,7 @@ namespace FPCharacter
 
         IEnumerator Run(bool fromBlack = false)
         {
+            CutsceneGate.Begin(this);
             BuildFader();
             if (fromBlack) black.alpha = 1f;
             else yield return Fade(0f, 1f, 2f);

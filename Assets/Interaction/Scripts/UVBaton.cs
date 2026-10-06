@@ -138,7 +138,7 @@ namespace FPCharacter
 
         void Update()
         {
-            if (Digit2Pressed()) SetActive(!Active, true);
+            if (!GamePause.BlockInput && Digit2Pressed()) SetActive(!Active, true);
             if (!Active || model == null) return;
             sway += Time.deltaTime;
             float fl = 0.94f + 0.06f * Mathf.Sin(sway * 31f) * Mathf.Sin(sway * 7f);

@@ -21,6 +21,10 @@ namespace FPCharacter
         public Vector3 gogglesRoomCenter = new Vector3(112.15f, 0f, 1.5f);
         public Vector2 gogglesRoomSize = new Vector2(46.5f, 34f);
         public float gogglesHintAfter = 12f;
+        public float sitHintAfter = 45f;
+        public Vector3 finalRoomCenter = new Vector3(237f, 0f, 0f);
+        public Vector2 finalRoomSize = new Vector2(52f, 52f);
+        public float journalHintAfter = 45f;
         float currentStart;
 
         static readonly HashSet<string> done = new HashSet<string>();
@@ -62,7 +66,10 @@ namespace FPCharacter
         MirrorPickup[] mirrors;
         NPCCutscene[] npcs;
         InfraredGogglesPickup goggles;
-        float inGogglesRoom;
+        float inGogglesRoom, inEmberUnseated, inFinalRoom;
+        PlayerSeat emberSeat;
+        bool seatUsed;
+        GameObject finalJournal;
         float inHollows, torchLitAt = -1f, poweredAt = -1f, solvedAt = -1f, lastTorchHint = -1f;
         bool mirrorTouched;
 
@@ -77,6 +84,10 @@ namespace FPCharacter
             mirrors = FindObjectsByType<MirrorPickup>(FindObjectsInactive.Include);
             npcs = FindObjectsByType<NPCCutscene>(FindObjectsInactive.Include);
             goggles = FindAnyObjectByType<InfraredGogglesPickup>(FindObjectsInactive.Exclude);
+            foreach (PlayerSeat s in FindObjectsByType<PlayerSeat>(FindObjectsInactive.Include))
+                if (InRoom(s.transform.position, gogglesRoomCenter, gogglesRoomSize)) { emberSeat = s; break; }
+            JournalReader jr = FindAnyObjectByType<JournalReader>(FindObjectsInactive.Include);
+            if (jr != null) finalJournal = jr.gameObject;
             if (!string.IsNullOrEmpty(returnLine))
             {
                 Enqueue(returnLine, returnLineDelay, null);
@@ -119,6 +130,8 @@ namespace FPCharacter
             UpdateNpcs();
             UpdateHollows();
             UpdateGoggles();
+            UpdateSitHint();
+            UpdateJournalHint();
             if (current != null && Time.time >= currentUntil && !source.isPlaying) current = null;
             if (Busy() || queue.Count == 0) return;
             for (int i = 0; i < queue.Count; i++)
@@ -156,6 +169,40 @@ namespace FPCharacter
             if (goggles == null || !goggles.gameObject.activeInHierarchy) return false;
             PlayerInteraction pi = PlayerInteraction.Instance;
             return pi == null || !pi.hasGoggles;
+        }
+
+        static bool InRoom(Vector3 p, Vector3 c, Vector2 size)
+        {
+            Vector3 d = p - c;
+            return Mathf.Abs(d.x) <= size.x * 0.5f && Mathf.Abs(d.z) <= size.y * 0.5f;
+        }
+
+        bool StillUnseated()
+        {
+            if (emberSeat == null || seatUsed || MinigameGate.IsFinished("warmstatues")) return false;
+            if (emberSeat.Occupied) { seatUsed = true; return false; }
+            return true;
+        }
+
+        void UpdateSitHint()
+        {
+            if (done.Contains("Hint_SitChair") || !StillUnseated()) return;
+            if (!InRoom(player.position, gogglesRoomCenter, gogglesRoomSize)) return;
+            inEmberUnseated += Time.deltaTime;
+            if (inEmberUnseated >= sitHintAfter) Enqueue("Hint_SitChair", 0f, StillUnseated);
+        }
+
+        bool JournalUntouched()
+        {
+            return finalJournal != null && finalJournal.activeInHierarchy;
+        }
+
+        void UpdateJournalHint()
+        {
+            if (done.Contains("Hint_Journal") || !JournalUntouched()) return;
+            if (!InRoom(player.position, finalRoomCenter, finalRoomSize)) return;
+            inFinalRoom += Time.deltaTime;
+            if (inFinalRoom >= journalHintAfter) Enqueue("Hint_Journal", 0f, JournalUntouched);
         }
 
         void UpdateGoggles()

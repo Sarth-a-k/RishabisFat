@@ -423,6 +423,7 @@ namespace FPCharacter
                 screen.enabled = true;
                 vp.SetDirectAudioVolume(0, videoVolume);
                 vp.Play();
+                CutsceneGate.Begin(this);
                 float since = 0f;
                 while (!videoDone)
                 {
@@ -438,6 +439,7 @@ namespace FPCharacter
                     vp.SetDirectAudioVolume(0, videoVolume * (1f - t));
                 });
                 vp.Stop();
+                CutsceneGate.End(this);
             }
 
             if (pi != null) pi.HoldBooks(Vector3.zero, 0f, Vector3.zero, 0f);
