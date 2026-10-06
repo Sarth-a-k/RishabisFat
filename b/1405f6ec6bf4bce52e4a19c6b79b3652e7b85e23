@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a148d7dad60e20749a2d574abb0dc68d, type: 3}
+  m_Name: Shadow2D_Dialogue
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueSet
+  defaultHoldSeconds: 3.2
+  speakers:
+  - id: You
+    displayName: YOU
+    nameColor: {r: 0.95, g: 0.78, b: 0.42, a: 1}
+  - id: Ghost
+    displayName: ???
+    nameColor: {r: 0.55, g: 0.75, b: 1, a: 1}
+  lines:
+  - key: Intro_01
+    speakerId: You
+    text: Where... where am I? I was at the door. I can't feel my legs.
+    holdSeconds: 3.6
+  - key: Intro_02
+    speakerId: Ghost
+    text: You are still at the door, traveller. Your body is lying where it fell. This is the room behind your eyes.
+    holdSeconds: 5
+  - key: Intro_03
+    speakerId: Ghost
+    text: Everything that walks in here, you brought in with you. Run, if it makes you feel better. Running has never helped.
+    holdSeconds: 5
+  - key: Bark_FirstShadow
+    speakerId: You
+    text: Something is behind me. Please, no. Don't look back.
+    holdSeconds: 3.2
+  - key: Bark_SecondShadow
+    speakerId: Ghost
+    text: They are wearing your face, under the dark.
+    holdSeconds: 3.2
+  - key: Bark_TorchFlicker
+    speakerId: You
+    text: No, no, no. Not the torch. Stay lit. Please stay lit.
+    holdSeconds: 3.2
+  - key: Bark_Halfway
+    speakerId: Ghost
+    text: A mind cannot outrun itself.
+    holdSeconds: 3.2
+  - key: Bark_TorchDies
+    speakerId: You
+    text: I can't see. I can't see! Somebody, wake me up!
+    holdSeconds: 3.2
+  - key: Bark_Smothered
+    speakerId: Ghost
+    text: Sleep, then. We will begin again.
+    holdSeconds: 2.8

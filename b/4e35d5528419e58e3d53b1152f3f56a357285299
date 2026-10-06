@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3590c487424fa9499f449e18e8cf1d9, type: 3}
+  m_Name: VoiceLines
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineSet
+  lines:
+  - key: Npc_Ignore_01
+    clip: {fileID: 8300000, guid: b50b45aaa95ebd3448eb11372f3dbfcb, type: 3}
+    speaker: 
+    subtitle: 'Hmm.. I think I should speak with the old man'
+    volume: 1
+  - key: Npc_Ignore_02
+    clip: {fileID: 8300000, guid: 40ba55788bd59e44898dcb793623094f, type: 3}
+    speaker: 
+    subtitle: 'Some insight would be helpful'
+    volume: 1
+  - key: Hint_Torch
+    clip: {fileID: 8300000, guid: 8af9a260dd490cc4f8c14b038f60057f, type: 3}
+    speaker: 
+    subtitle: 'A light source must be nearby'
+    volume: 1
+  - key: Hint_Mirrors
+    clip: {fileID: 8300000, guid: 0fdee899a15604c498632651d9d74fed, type: 3}
+    speaker: 
+    subtitle: '[3mirrorhint - type the subtitle here]'
+    volume: 1
+  - key: Hint_PrismRotate
+    clip: {fileID: 8300000, guid: 5f54b7d0453f3c64da20a588c9cbc314, type: 3}
+    speaker: 
+    subtitle: '[prismrotation - type the subtitle here]'
+    volume: 1
+  - key: Hint_RedMoon
+    clip: {fileID: 8300000, guid: fb262ec01a1f2174bbe5c616669a25e6, type: 3}
+    speaker: 
+    subtitle: 'Red full moon.. hmm, I think this is my cue to leave'
+    volume: 1
+  - key: Return_PrismaticMinigame
+    clip: {fileID: 8300000, guid: b3f900ce8465465695956ac42b5e8fae, type: 3}
+    speaker: 
+    subtitle: 'My....ahhh...My mind is playing tricks on me'
+    volume: 1
+  - key: Return_EmberMinigame
+    clip: {fileID: 8300000, guid: 7d567920c39d4520a00b969e2d45ceb5, type: 3}
+    speaker: 
+    subtitle: 'Why did those silhouettes look just like me?'
+    volume: 1
+  - key: Hint_Goggles
+    clip: {fileID: 8300000, guid: 38deac8c19d14eb79d18dbff8396f6af, type: 3}
+    speaker: 
+    subtitle: 'Ohh... wait wait... wait... wait wait, is that the thermal vision goggles lying next to the skeleton?'
+    volume: 1
+  - key: Hint_SitChair
+    clip: {fileID: 8300000, guid: 7a4815e0e679489db73ffe8fe474f7bb, type: 3}
+    speaker: 
+    subtitle: 'Why isn''t anything happening? Should I be sitting on the chair too?'
+    volume: 1
+  - key: Hint_Journal
+    clip: {fileID: 8300000, guid: 7068c1be3c55471e819db85337a1d33c, type: 3}
+    speaker: 
+    subtitle: 'Wait, do I see a journal beside the skeleton on the throne?'
+    volume: 1
+  npcIgnoreKeys:
+  - Npc_Ignore_01
+  - Npc_Ignore_02
