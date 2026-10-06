@@ -1,0 +1,230 @@
+[
+  {
+    "sourceMesh": "Cube.134",
+    "file": "Cube_134.obj",
+    "dimensionsXYZ": [
+      0.59373,
+      0.30066,
+      1.07256
+    ],
+    "vertices": 24,
+    "triangles": 12,
+    "purpose": "narrow floor stone / decorative segment"
+  },
+  {
+    "sourceMesh": "Circle",
+    "file": "Circle.obj",
+    "dimensionsXYZ": [
+      1.90211,
+      0.10468,
+      2.0
+    ],
+    "vertices": 50,
+    "triangles": 28,
+    "purpose": "round seal medallion"
+  },
+  {
+    "sourceMesh": "Cube.008",
+    "file": "Cube_008.obj",
+    "dimensionsXYZ": [
+      3.0,
+      0.25243,
+      3.0
+    ],
+    "vertices": 24,
+    "triangles": 12,
+    "purpose": "square stone floor tile"
+  },
+  {
+    "sourceMesh": "Cube.048",
+    "file": "Cube_048.obj",
+    "dimensionsXYZ": [
+      0.94472,
+      3.29115,
+      1.1726
+    ],
+    "vertices": 100,
+    "triangles": 44,
+    "purpose": "ornate square column"
+  },
+  {
+    "sourceMesh": "Cube.049",
+    "file": "Cube_049.obj",
+    "dimensionsXYZ": [
+      3.0,
+      3.22714,
+      1.14447
+    ],
+    "vertices": 230,
+    "triangles": 136,
+    "purpose": "solid wall panel"
+  },
+  {
+    "sourceMesh": "Cube.052",
+    "file": "Cube_052.obj",
+    "dimensionsXYZ": [
+      3.86357,
+      0.40826,
+      0.43178
+    ],
+    "vertices": 40,
+    "triangles": 28,
+    "purpose": "stone lintel / crossbeam"
+  },
+  {
+    "sourceMesh": "Cube.087",
+    "file": "Cube_087.obj",
+    "dimensionsXYZ": [
+      3.0,
+      0.6549,
+      0.75429
+    ],
+    "vertices": 144,
+    "triangles": 82,
+    "purpose": "wall cornice"
+  },
+  {
+    "sourceMesh": "Cube.090",
+    "file": "Cube_090.obj",
+    "dimensionsXYZ": [
+      0.72565,
+      0.72565,
+      0.16658
+    ],
+    "vertices": 426,
+    "triangles": 373,
+    "purpose": "vertical embossed wall medallion"
+  },
+  {
+    "sourceMesh": "Cube.133",
+    "file": "Cube_133.obj",
+    "dimensionsXYZ": [
+      0.59416,
+      0.30066,
+      3.02559
+    ],
+    "vertices": 66,
+    "triangles": 34,
+    "purpose": "long narrow floor tile"
+  },
+  {
+    "sourceMesh": "Cube.145",
+    "file": "Cube_145.obj",
+    "dimensionsXYZ": [
+      3.0,
+      0.25243,
+      3.0
+    ],
+    "vertices": 24,
+    "triangles": 12,
+    "purpose": "square variant floor tile"
+  },
+  {
+    "sourceMesh": "Cube.169",
+    "file": "Cube_169.obj",
+    "dimensionsXYZ": [
+      3.0,
+      1.35337,
+      0.75429
+    ],
+    "vertices": 168,
+    "triangles": 86,
+    "purpose": "broken cornice / short broken wall"
+  },
+  {
+    "sourceMesh": "Cube.170",
+    "file": "Cube_170.obj",
+    "dimensionsXYZ": [
+      3.0,
+      0.25243,
+      3.0
+    ],
+    "vertices": 72,
+    "triangles": 36,
+    "purpose": "square variant floor tile"
+  },
+  {
+    "sourceMesh": "Cube.171",
+    "file": "Cube_171.obj",
+    "dimensionsXYZ": [
+      1.32189,
+      0.2817,
+      1.32189
+    ],
+    "vertices": 68,
+    "triangles": 44,
+    "purpose": "small square inset / cap"
+  },
+  {
+    "sourceMesh": "Cube.195",
+    "file": "Cube_195.obj",
+    "dimensionsXYZ": [
+      3.15249,
+      1.11706,
+      2.39798
+    ],
+    "vertices": 192,
+    "triangles": 96,
+    "purpose": "stair flight"
+  },
+  {
+    "sourceMesh": "Cube.196",
+    "file": "Cube_196.obj",
+    "dimensionsXYZ": [
+      0.36859,
+      1.52801,
+      2.49333
+    ],
+    "vertices": 34,
+    "triangles": 20,
+    "purpose": "stair side cheek / triangular support"
+  },
+  {
+    "sourceMesh": "Cube.229",
+    "file": "Cube_229.obj",
+    "dimensionsXYZ": [
+      3.17023,
+      0.40681,
+      0.40681
+    ],
+    "vertices": 70,
+    "triangles": 44,
+    "purpose": "long narrow beam"
+  },
+  {
+    "sourceMesh": "Cube.231",
+    "file": "Cube_231.obj",
+    "dimensionsXYZ": [
+      0.11716,
+      0.21304,
+      0.05856
+    ],
+    "vertices": 96,
+    "triangles": 64,
+    "purpose": "chain link"
+  },
+  {
+    "sourceMesh": "Cylinder",
+    "file": "Cylinder.obj",
+    "dimensionsXYZ": [
+      0.35964,
+      0.66388,
+      0.41582
+    ],
+    "vertices": 131,
+    "triangles": 106,
+    "purpose": "sconce / bowl"
+  },
+  {
+    "sourceMesh": "Cylinder.001",
+    "file": "Cylinder_001.obj",
+    "dimensionsXYZ": [
+      0.97596,
+      0.02732,
+      0.95149
+    ],
+    "vertices": 91,
+    "triangles": 47,
+    "purpose": "flat circular inset"
+  }
+]

@@ -1,0 +1,14 @@
+newmtl Torch_Wood
+Kd 0.22 0.115 0.044
+Ks 0.025 0.025 0.025
+Ns 8
+
+newmtl Torch_IronBindings
+Kd 0.065 0.075 0.083
+Ks 0.22 0.24 0.27
+Ns 30
+
+newmtl Torch_Wick
+Kd 0.24 0.17 0.085
+Ks 0.04 0.04 0.04
+Ns 5

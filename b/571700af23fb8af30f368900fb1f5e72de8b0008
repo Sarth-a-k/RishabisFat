@@ -1,0 +1,14 @@
+newmtl brickwall1
+Kd .36 .38 .40
+Ks .04 .04 .04
+Ns 10
+
+newmtl stonefloor
+Kd .27 .29 .31
+Ks .05 .05 .05
+Ns 10
+
+newmtl stonetrims
+Kd .49 .47 .42
+Ks .04 .04 .04
+Ns 10

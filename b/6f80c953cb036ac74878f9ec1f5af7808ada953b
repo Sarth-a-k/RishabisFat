@@ -1,0 +1,5 @@
+newmtl SunkenKingdom
+Kd 1 1 1
+Ks 0.08 0.08 0.08
+Ns 10
+map_Kd ../Textures/11524_Dungeon_DefaultMaterial_AlbedoTransparency.jpg
