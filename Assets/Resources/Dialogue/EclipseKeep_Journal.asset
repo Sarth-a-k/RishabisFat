@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f27a67cdcb40ca64595dc3d77698516c, type: 3}
+  m_Name: EclipseKeep_Journal
+  m_EditorClassIdentifier: Assembly-CSharp::JournalSet
+  title: Journal
+  pages:
+  - heading: The first day
+    body: 'Found the door at the edge of the citadel. It opened before I touched it.
+
+
+      I don''t remember the climb. I remember the door.'
+  - heading: The first day
+    body: 'A hall under a painted moon. Three mirrors, one torch, one prism.
+
+
+      I set the mirrors. When I turned around, one of them had moved.
+
+
+      I bet I placed it right.'
+  - heading: The first day
+    body: 'A ghost sat in the passage. He spoke like he had known me for years.
+
+
+      He said this is the room behind my eyes.'
+  - heading: The first day
+    body: 'The statues were warm. The goggles showed me which one.
+
+
+      The last one cracked. There was a body inside, wearing my helmet.'
+  - heading: The first day
+    body: 'A violet room. Footprints only the light could find. They led to a red button.
+
+
+      The prints were my size.'
+  - heading: The first day
+    body: 'There is someone on the throne. He has my goggles. He has this journal.
+
+
+      The handwriting is mine.
+
+
+      It is the same day. It is always the same day.'
+  thoughtAfterLastPage: '"It''s my handwriting."'

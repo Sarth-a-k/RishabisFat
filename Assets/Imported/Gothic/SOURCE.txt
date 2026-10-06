@@ -1,0 +1,5 @@
+Source supplied by user: C:/Users/vrish/Downloads/modularDungeon.fbx
+Converted 13 visible architectural modules to normalized OBJ: Y-up, meters, centered in XZ, minimum Y=0. Excluded collision-only meshes.
+Original polygon UVs, normals, and 3 material assignments preserved. Missing externally referenced source textures were not available; neutral placeholder colors provided for replacement in Unity.
+Source texture paths refer to /home/skikk/Documenten/Normord/normordart/textures.
+No license assertion is made.

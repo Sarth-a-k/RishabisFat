@@ -1,0 +1,5 @@
+Source supplied by user: C:/Users/vrish/Downloads/modular-myan-inspired-dungeon/source/Unity2Skfb.zip
+Original glTF generator: UnityGLTF (2018.2.2f1), 19 unique source meshes, 536 scene nodes.
+Converted unique meshes to OBJ with original UVs and normals, x100 unit scale, -90-degree X rotation; each mesh centered in XZ with base Y=0.
+Textures copied unchanged from source ZIP. Material name: Sunken Kingdom.
+No license terms were present in source archive. Preserve original provenance and confirm rights before external distribution.

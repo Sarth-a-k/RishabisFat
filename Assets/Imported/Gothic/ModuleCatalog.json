@@ -1,0 +1,222 @@
+[
+  {
+    "sourceModel": "Hall.X",
+    "sourceGeometry": "Hall.X",
+    "file": "Hall_X.obj",
+    "dimensionsXYZ": [
+      14.0,
+      5.99888,
+      14.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 1503,
+    "triangles": 2702
+  },
+  {
+    "sourceModel": "Hall.T",
+    "sourceGeometry": "Hall.T",
+    "file": "Hall_T.obj",
+    "dimensionsXYZ": [
+      9.4,
+      5.99888,
+      14.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 1212,
+    "triangles": 2184
+  },
+  {
+    "sourceModel": "Hall.L",
+    "sourceGeometry": "Hall.L",
+    "file": "Hall_L.obj",
+    "dimensionsXYZ": [
+      9.4,
+      5.99888,
+      9.4
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 895,
+    "triangles": 1666
+  },
+  {
+    "sourceModel": "Room.L",
+    "sourceGeometry": "Room.L",
+    "file": "Room_L.obj",
+    "dimensionsXYZ": [
+      13.4,
+      5.99888,
+      13.4
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 2535,
+    "triangles": 4442
+  },
+  {
+    "sourceModel": "Room.T",
+    "sourceGeometry": "Room.T",
+    "file": "Room_T.obj",
+    "dimensionsXYZ": [
+      13.4,
+      5.99888,
+      14.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 2539,
+    "triangles": 4448
+  },
+  {
+    "sourceModel": "Room.X",
+    "sourceGeometry": "Room.X",
+    "file": "Room_X.obj",
+    "dimensionsXYZ": [
+      14.0,
+      5.99888,
+      14.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 2543,
+    "triangles": 4454
+  },
+  {
+    "sourceModel": "Room.I",
+    "sourceGeometry": "Room.I",
+    "file": "Room_I.obj",
+    "dimensionsXYZ": [
+      12.8,
+      5.99888,
+      14.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 2535,
+    "triangles": 4442
+  },
+  {
+    "sourceModel": "Stairs",
+    "sourceGeometry": "Stairs",
+    "file": "Stairs.obj",
+    "dimensionsXYZ": [
+      4.0,
+      9.99667,
+      10.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 289,
+    "triangles": 359
+  },
+  {
+    "sourceModel": "Doorway",
+    "sourceGeometry": "Doorway",
+    "file": "Doorway.obj",
+    "dimensionsXYZ": [
+      1.0,
+      4.0,
+      4.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonetrims"
+    ],
+    "vertices": 160,
+    "triangles": 308
+  },
+  {
+    "sourceModel": "RoomCap",
+    "sourceGeometry": "RoomCap",
+    "file": "RoomCap.obj",
+    "dimensionsXYZ": [
+      12.8,
+      5.99888,
+      13.4
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 2377,
+    "triangles": 4436
+  },
+  {
+    "sourceModel": "HallI",
+    "sourceGeometry": "ceilingArch.024",
+    "file": "HallI.obj",
+    "dimensionsXYZ": [
+      4.8,
+      5.99888,
+      14.0
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 898,
+    "triangles": 1666
+  },
+  {
+    "sourceModel": "StairsL",
+    "sourceGeometry": "StairsL",
+    "file": "StairsL.obj",
+    "dimensionsXYZ": [
+      9.4,
+      9.99667,
+      9.4
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 592,
+    "triangles": 959
+  },
+  {
+    "sourceModel": "Hallsingle",
+    "sourceGeometry": "ceilingArch.002",
+    "file": "Hallsingle.obj",
+    "dimensionsXYZ": [
+      4.8,
+      5.99888,
+      4.8
+    ],
+    "materials": [
+      "brickwall1",
+      "stonefloor",
+      "stonetrims"
+    ],
+    "vertices": 339,
+    "triangles": 626
+  }
+]
