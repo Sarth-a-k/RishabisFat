@@ -58,6 +58,9 @@ namespace FPCharacter
         void Wire(global::PauseMenu menu)
         {
             if (menu == null || menu == wired) return;
+            if (menu.onHints == null) menu.onHints = new UnityEngine.Events.UnityEvent();
+            if (menu.onPaused == null) menu.onPaused = new UnityEngine.Events.UnityEvent();
+            if (menu.onResumed == null) menu.onResumed = new UnityEngine.Events.UnityEvent();
             wired = menu;
             menu.onHints.AddListener(Show);
             menu.onPaused.AddListener(OnPaused);

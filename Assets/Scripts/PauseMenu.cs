@@ -34,9 +34,9 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Buttons")]
     [Tooltip("Called when HINTS is pressed. Empty for now.")]
-    public UnityEvent onHints;
-    public UnityEvent onPaused;
-    public UnityEvent onResumed;
+    public UnityEvent onHints = new UnityEvent();
+    public UnityEvent onPaused = new UnityEvent();
+    public UnityEvent onResumed = new UnityEvent();
 
     [Header("Sound")]
     [Range(0f, 1f)] public float uiVolume = 0.6f;

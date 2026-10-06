@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 public class WarmStatues2D : MonoBehaviour
 {
@@ -651,29 +654,29 @@ public class WarmStatues2D : MonoBehaviour
     {
         if (phase == "title")
         {
-            if (Input.anyKeyDown) Begin();
+            if (AnyDown()) Begin();
             return;
         }
-        if (Input.GetKeyDown(KeyCode.R) && (phase == "play" || phase == "caught")) { ResetGame(); return; }
+        if (Down(KeyCode.R) && (phase == "play" || phase == "caught")) { ResetGame(); return; }
         if (phase != "play") return;
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Down(KeyCode.G))
         {
             thermal = !thermal;
             if (thermal) creepAt = t + 0.8f;
         }
         int dx = 0, dy = 0;
         bool down = false;
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) { dx = -1; down = true; }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) { dx = 1; down = true; }
-        else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) { dy = -1; down = true; }
-        else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) { dy = 1; down = true; }
+        if (Down(KeyCode.A) || Down(KeyCode.LeftArrow)) { dx = -1; down = true; }
+        else if (Down(KeyCode.D) || Down(KeyCode.RightArrow)) { dx = 1; down = true; }
+        else if (Down(KeyCode.W) || Down(KeyCode.UpArrow)) { dy = -1; down = true; }
+        else if (Down(KeyCode.S) || Down(KeyCode.DownArrow)) { dy = 1; down = true; }
         if (down) { heldFor = 0f; Move(dx, dy); return; }
 
         int hx = 0, hy = 0;
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) hx = -1;
-        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) hx = 1;
-        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) hy = -1;
-        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) hy = 1;
+        if (Held(KeyCode.A) || Held(KeyCode.LeftArrow)) hx = -1;
+        else if (Held(KeyCode.D) || Held(KeyCode.RightArrow)) hx = 1;
+        else if (Held(KeyCode.W) || Held(KeyCode.UpArrow)) hy = -1;
+        else if (Held(KeyCode.S) || Held(KeyCode.DownArrow)) hy = 1;
         if (hx != 0 || hy != 0)
         {
             heldFor += Time.deltaTime;
@@ -681,6 +684,61 @@ public class WarmStatues2D : MonoBehaviour
         }
         else heldFor = 0f;
     }
+
+    // Read through the Input System like the other minigames; the legacy Input class does not register keys here.
+    static bool AnyDown()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame) return true;
+        if (Mouse.current != null && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame)) return true;
+        if (Gamepad.current != null && (Gamepad.current.startButton.wasPressedThisFrame || Gamepad.current.buttonSouth.wasPressedThisFrame)) return true;
+        return false;
+#else
+        return Input.anyKeyDown;
+#endif
+    }
+
+    static bool Down(KeyCode code)
+    {
+#if ENABLE_INPUT_SYSTEM
+        var k = KeyFor(code);
+        return k != null && k.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(code);
+#endif
+    }
+
+    static bool Held(KeyCode code)
+    {
+#if ENABLE_INPUT_SYSTEM
+        var k = KeyFor(code);
+        return k != null && k.isPressed;
+#else
+        return Input.GetKey(code);
+#endif
+    }
+
+#if ENABLE_INPUT_SYSTEM
+    static UnityEngine.InputSystem.Controls.KeyControl KeyFor(KeyCode code)
+    {
+        var kb = Keyboard.current;
+        if (kb == null) return null;
+        switch (code)
+        {
+            case KeyCode.A: return kb.aKey;
+            case KeyCode.D: return kb.dKey;
+            case KeyCode.W: return kb.wKey;
+            case KeyCode.S: return kb.sKey;
+            case KeyCode.R: return kb.rKey;
+            case KeyCode.G: return kb.gKey;
+            case KeyCode.LeftArrow: return kb.leftArrowKey;
+            case KeyCode.RightArrow: return kb.rightArrowKey;
+            case KeyCode.UpArrow: return kb.upArrowKey;
+            case KeyCode.DownArrow: return kb.downArrowKey;
+            default: return null;
+        }
+    }
+#endif
 
     void Update()
     {
